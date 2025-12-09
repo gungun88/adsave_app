@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "FB AdsSaver - Ad Library Downloader",
+  "version": "1.0.0",
+  "description": "Download high-quality videos and ad copy from the Facebook Ads Library.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.facebook.com/*"
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "FB AdsSaver"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

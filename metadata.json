@@ -1,0 +1,5 @@
+{
+  "name": "facebook-ads-downloader",
+  "description": "A professional tool to parse and download video assets from the Facebook Ads Library using a simulated headless browser approach.",
+  "requestFramePermissions": []
+}

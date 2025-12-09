@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --version:*)",
+      "Bash(npm:*)",
+      "Bash(npx playwright install chromium)",
+      "Bash(node server.js:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill /F /PID 64200)",
+      "Bash(taskkill //F //PID 64200)",
+      "Bash(taskkill //F //PID 61472)",
+      "Bash(timeout /t 2 /nobreak)",
+      "Bash(taskkill //F //PID 17544)",
+      "Bash(taskkill //F //PID 47028)",
+      "Bash(taskkill //F //PID 48596)",
+      "Bash(set PORT=5173)",
+      "Bash(taskkill:*)",
+      "Bash(taskkill /F /PID 15504)",
+      "Bash(taskkill /F /PID 57092)",
+      "Bash(dir:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
