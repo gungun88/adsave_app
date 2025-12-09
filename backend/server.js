@@ -85,13 +85,25 @@ app.post('/api/parse', async (req, res) => {
     let posterUrl = null;
     let fileSize = null; // To store content-length
 
-    // INTERCEPT NETWORK TRAFFIC
+    // INTERCEPT NETWORK TRAFFIC - More aggressive blocking
     await page.route('**/*', async (route) => {
         const request = route.request();
-        // Block unnecessary resources to speed up
-        if (['font', 'stylesheet'].includes(request.resourceType())) {
+        const resourceType = request.resourceType();
+        const url = request.url();
+
+        // Block fonts and stylesheets
+        if (['font', 'stylesheet'].includes(resourceType)) {
             return route.abort();
         }
+
+        // Block tracking and analytics
+        if (url.includes('google-analytics') ||
+            url.includes('doubleclick') ||
+            url.includes('facebook.com/tr') ||
+            url.includes('connect.facebook.net')) {
+            return route.abort();
+        }
+
         return route.continue();
     });
 
@@ -120,9 +132,9 @@ app.post('/api/parse', async (req, res) => {
       }
     });
 
-    // Navigate to the page
+    // Navigate to the page - Reduced timeout
     console.log('Navigating to page...');
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // Wait specifically for the ad container to ensure dynamic content loads
     // Instead of waiting for networkidle (which can be flaky on FB), we wait for generic text
@@ -132,9 +144,9 @@ app.post('/api/parse', async (req, res) => {
         console.log('Main container wait timeout, proceeding anyway...');
     }
 
-    // Scroll to trigger lazy loading
+    // Scroll to trigger lazy loading - Reduced delay
     await page.evaluate(() => window.scrollTo(0, 500));
-    await delay(1000); // Reduced from 2000ms to 1000ms
+    await delay(500); // Reduced from 1000ms
 
     // DOM Extraction Strategy (Robust)
     console.log('Extracting DOM data...');
@@ -370,10 +382,10 @@ app.post('/api/parse', async (req, res) => {
         return null;
       });
 
-      // If duration is not available yet, wait a bit and try again
+      // If duration is not available yet, wait a bit and try again - Reduced delay
       if (!videoDuration) {
         console.log('Duration not ready, waiting for video metadata...');
-        await delay(1500); // Reduced from 2000ms to 1500ms
+        await delay(1000); // Reduced from 1500ms
         videoDuration = await page.evaluate(() => {
           const video = document.querySelector('video');
           if (video && video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
