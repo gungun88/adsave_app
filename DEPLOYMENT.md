@@ -14,6 +14,12 @@
 - PM2 (进程管理器)
 - Nginx (已包含在宝塔面板)
 
+### 可选软件（推荐）
+- **Redis** (缓存服务，提升性能)
+  - 安装后可实现持久化缓存
+  - 多实例部署时共享缓存
+  - 详见：[Redis 集成指南](backend/REDIS_SETUP.md)
+
 ---
 
 ## 🚀 部署步骤
@@ -96,6 +102,9 @@ npm run build
 # 安装后端依赖
 cd backend
 npm install
+
+# (可选) 配置 Redis - 详见 backend/REDIS_SETUP.md
+# 如果不配置 Redis，系统会自动使用内存缓存
 
 # 安装 Playwright 浏览器
 npx playwright install chromium

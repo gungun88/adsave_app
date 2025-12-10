@@ -7,10 +7,87 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+
+// Try to load Redis, fallback to memory cache if unavailable
+let redis = null;
+let useRedis = false;
+
+try {
+  redis = require('./config/redis');
+  useRedis = true;
+  console.log('[Cache] Redis enabled');
+} catch (error) {
+  console.log('[Cache] Redis not available, using memory cache');
+  useRedis = false;
+}
 
 // Reusable browser instance
 let browser = null;
+
+// Memory cache for parsed ads (fallback when Redis is not available)
+const memoryCache = new Map();
+const CACHE_TTL = (process.env.CACHE_TTL || 300) * 1000; // Default 5 minutes
+
+// Clean up expired memory cache entries every minute (only if not using Redis)
+if (!useRedis) {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, value] of memoryCache.entries()) {
+      if (now - value.timestamp > CACHE_TTL) {
+        memoryCache.delete(key);
+        console.log(`[Cache] Removed expired entry: ${key.substring(0, 50)}...`);
+      }
+    }
+  }, 60 * 1000);
+}
+
+// Cache helper functions
+async function getCache(key) {
+  if (useRedis) {
+    try {
+      const data = await redis.get(key);
+      if (data) {
+        return JSON.parse(data);
+      }
+      return null;
+    } catch (error) {
+      console.error('[Cache] Redis get error:', error.message);
+      // Fallback to memory cache
+      const cached = memoryCache.get(key);
+      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        return cached.data;
+      }
+      return null;
+    }
+  } else {
+    // Memory cache
+    const cached = memoryCache.get(key);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return cached.data;
+    }
+    return null;
+  }
+}
+
+async function setCache(key, data) {
+  if (useRedis) {
+    try {
+      const ttlSeconds = Math.floor(CACHE_TTL / 1000);
+      await redis.setex(key, ttlSeconds, JSON.stringify(data));
+      console.log(`[Cache] Redis saved: ${key.substring(0, 50)}...`);
+    } catch (error) {
+      console.error('[Cache] Redis set error:', error.message);
+      // Fallback to memory cache
+      memoryCache.set(key, { data, timestamp: Date.now() });
+      console.log(`[Cache] Memory saved (fallback): ${key.substring(0, 50)}...`);
+    }
+  } else {
+    // Memory cache
+    memoryCache.set(key, { data, timestamp: Date.now() });
+    console.log(`[Cache] Memory saved: ${key.substring(0, 50)}...`);
+  }
+}
 
 // Initialize browser on startup
 const initBrowser = async () => {
@@ -64,12 +141,28 @@ app.post('/api/parse', async (req, res) => {
     return res.status(400).json({ error: 'Invalid URL provided' });
   }
 
+  // Performance monitoring
+  const perfStart = Date.now();
+  const perfLog = (stage) => {
+    console.log(`[Perf] ${stage}: ${Date.now() - perfStart}ms`);
+  };
+
   console.log(`[Start] Processing: ${url}`);
+
+  // Check cache first
+  const cacheKey = url;
+  const cached = await getCache(cacheKey);
+  if (cached) {
+    console.log(`[Cache] Hit! Returning cached data`);
+    perfLog('Cache retrieval');
+    return res.json(cached);
+  }
 
   let context = null;
   try {
     // Get or create browser (reusing existing instance)
     const browserInstance = await getBrowser();
+    perfLog('Browser ready');
 
     const context = await browserInstance.newContext({
       viewport: { width: 1280, height: 800 },
@@ -79,6 +172,7 @@ app.post('/api/parse', async (req, res) => {
     });
 
     const page = await context.newPage();
+    perfLog('Context & page created');
 
     // Variables to capture
     let videoUrl = null;
@@ -135,18 +229,21 @@ app.post('/api/parse', async (req, res) => {
     // Navigate to the page - Reduced timeout
     console.log('Navigating to page...');
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    perfLog('Page loaded');
 
     // Wait specifically for the ad container to ensure dynamic content loads
     // Instead of waiting for networkidle (which can be flaky on FB), we wait for generic text
     try {
-        await page.waitForSelector('div[role="main"], div[aria-label="Ad details"]', { timeout: 10000 });
+        await page.waitForSelector('div[role="main"], div[aria-label="Ad details"]', { timeout: 5000 }); // Reduced from 10000ms
+        perfLog('Main container loaded');
     } catch (e) {
         console.log('Main container wait timeout, proceeding anyway...');
     }
 
     // Scroll to trigger lazy loading - Reduced delay
     await page.evaluate(() => window.scrollTo(0, 500));
-    await delay(500); // Reduced from 1000ms
+    await delay(200); // Reduced from 500ms
+    perfLog('Scroll completed');
 
     // DOM Extraction Strategy (Robust)
     console.log('Extracting DOM data...');
@@ -353,6 +450,7 @@ app.post('/api/parse', async (req, res) => {
     });
 
     console.log('DOM extraction result:', adInfo);
+    perfLog('DOM extraction completed');
 
     // Fallback if network intercept didn't catch video (e.g. cached)
     if (!videoUrl) {
@@ -385,7 +483,7 @@ app.post('/api/parse', async (req, res) => {
       // If duration is not available yet, wait a bit and try again - Reduced delay
       if (!videoDuration) {
         console.log('Duration not ready, waiting for video metadata...');
-        await delay(1000); // Reduced from 1500ms
+        await delay(500); // Reduced from 1000ms
         videoDuration = await page.evaluate(() => {
           const video = document.querySelector('video');
           if (video && video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
@@ -403,6 +501,7 @@ app.post('/api/parse', async (req, res) => {
       console.log('Failed to extract duration:', e.message);
       videoDuration = 'Unknown';
     }
+    perfLog('Video duration extracted');
 
     // Enhanced poster extraction from video element
     if (!posterUrl) {
@@ -429,9 +528,10 @@ app.post('/api/parse', async (req, res) => {
 
     console.log('✅ Successfully extracted ad data');
     console.log('Final posterUrl:', posterUrl);
+    perfLog('Poster extraction completed');
 
-    // Return the result
-    res.json({
+    // Prepare response data
+    const responseData = {
       id: new URL(url).searchParams.get('id'),
       ...adInfo,
       videoUrl: videoUrl,
@@ -439,7 +539,15 @@ app.post('/api/parse', async (req, res) => {
       videoDuration: videoDuration,
       fileSize: formatBytes(fileSize), // Now using real size
       resolution: 'HD'
-    });
+    };
+
+    // Cache the result
+    await setCache(cacheKey, responseData);
+
+    perfLog('Total processing time');
+
+    // Return the result
+    res.json(responseData);
 
   } catch (error) {
     console.error('Error processing:', error);
