@@ -12,7 +12,7 @@ const redisConfig = {
   },
   maxRetriesPerRequest: 3,
   enableReadyCheck: true,
-  lazyConnect: true, // Don't connect immediately, wait for first command
+  lazyConnect: false
 };
 
 // Create Redis client
