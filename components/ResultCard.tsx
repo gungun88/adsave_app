@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AdData } from '../types';
 import { Download, FileVideo, ImageIcon, Play, CheckCircle2, Copy, AlertCircle } from './Icons';
 import { useLanguage } from '../lib/i18n';
+import { API_ENDPOINTS } from '../config';
 
 interface ResultCardProps {
   data: AdData;
@@ -23,7 +24,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({ data }) => {
       setDownloading(type);
 
       // Fetch the file through our backend proxy
-      const response = await fetch('http://localhost:3001/api/download', {
+      const response = await fetch(API_ENDPOINTS.download, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

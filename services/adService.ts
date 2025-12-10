@@ -1,5 +1,6 @@
 import { AdData } from '../types';
 import { Language } from '../lib/i18n';
+import { API_ENDPOINTS } from '../config';
 
 // Helper type for Chrome API (to avoid TS errors if types aren't installed)
 declare const chrome: any;
@@ -115,7 +116,7 @@ export const parseAdLink = async (url: string, lang: Language, onProgress: (msg:
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout (Playwright needs more time)
 
-    const response = await fetch('http://localhost:3001/api/parse', {
+    const response = await fetch(API_ENDPOINTS.parse, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
