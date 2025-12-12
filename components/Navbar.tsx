@@ -5,7 +5,11 @@ import { useLanguage } from '../lib/i18n';
 import { useAuth } from '../lib/authContext';
 import { getUsageStats } from '../services/usageService';
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  onTutorialClick: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onTutorialClick }) => {
   const { t, language, setLanguage } = useLanguage();
   const { user, loginWithGoogle, logout } = useAuth();
   const usage = getUsageStats(user);
@@ -54,7 +58,7 @@ export const Navbar: React.FC = () => {
           <button className="px-4 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-white rounded-full transition-all flex items-center gap-2">
             <Chrome size={14} className="text-blue-600/80"/> {t.nav?.chromeExt || 'Chrome Extension'}
           </button>
-          <button className="px-4 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-white rounded-full transition-all flex items-center gap-2">
+          <button onClick={onTutorialClick} className="px-4 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-white rounded-full transition-all flex items-center gap-2">
             <BookOpen size={14} className="text-indigo-500/80"/> {t.nav?.tutorial || 'Tutorial'}
           </button>
           <button onClick={scrollToFAQ} className="px-4 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-white rounded-full transition-all flex items-center gap-2">

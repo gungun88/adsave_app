@@ -119,7 +119,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen pb-20 overflow-x-hidden selection:bg-indigo-100 selection:text-indigo-900 bg-slate-50 relative">
-      <Navbar />
+      <Navbar onTutorialClick={() => setShowTutorialModal(true)} />
 
       {/* --- Enhanced Background Effects --- */}
       <div className="fixed inset-0 bg-grid-pattern -z-10 pointer-events-none h-[120vh]"></div>
