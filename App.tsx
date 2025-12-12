@@ -377,20 +377,21 @@ const App: React.FC = () => {
             <div className="p-6">
               <div className="bg-gray-900 rounded-xl overflow-hidden aspect-video">
                 <video
-                  src="/tutorial.mp4"
-                  poster="/tutorial-poster.jpg"
+                  key={showTutorialModal ? 'tutorial-video' : 'hidden'}
+                  src={`/tutorial.mp4?v=${Date.now()}`}
                   controls
+                  autoPlay
                   className="w-full h-full object-contain"
+                  onLoadedData={() => console.log('Video loaded successfully')}
                   onError={(e) => {
-                    const img = document.createElement('img');
-                    img.src = '/tutorial.gif';
-                    img.className = 'w-full h-full object-contain';
-                    img.onerror = () => {
-                      img.src = 'https://via.placeholder.com/1200x675/1f2937/9ca3af?text=Tutorial+Video+Here';
-                    };
-                    e.currentTarget.parentElement?.replaceChild(img, e.currentTarget);
+                    console.error('Video failed to load:', e);
+                    const target = e.currentTarget;
+                    console.log('Video src:', target.src);
+                    console.log('Video error:', target.error);
                   }}
-                />
+                >
+                  您的浏览器不支持视频播放。
+                </video>
               </div>
             </div>
           </div>
