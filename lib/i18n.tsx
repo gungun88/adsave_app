@@ -4,6 +4,14 @@ export type Language = 'en' | 'zh';
 
 export const translations = {
   en: {
+    nav: {
+      chromeExt: 'Chrome Extension',
+      tutorial: 'Tutorial',
+      faq: 'FAQ',
+      login: 'Login',
+      getStarted: 'Get Started',
+      credits: 'Credits Left'
+    },
     header: {
       how: "How it works",
       pricing: "Pricing",
@@ -28,7 +36,9 @@ export const translations = {
       mode_batch: "Batch Mode",
       extension_btn: "Install Chrome Extension",
       extension_desc: "Faster & More Convenient",
-      view_tutorial: "View Video Tutorial"
+      view_tutorial: "View Video Tutorial",
+      stats_hours: "Hours Saved",
+      stats_rating: "Rating"
     },
     tutorial: {
       title: "How It Works",
@@ -52,13 +62,40 @@ export const translations = {
       empty: "No recent history found."
     },
     features: {
-      title: "How to download Facebook Ads",
+      title: "Why Top Marketers Choose AdSave",
+      subtitle: "Everything you need to analyze, save, and iterate on winning creatives.",
+      sourceTitle: "1080p Source",
+      sourceDesc: "Get the raw file directly from CDN. No compression artifacts.",
+      stealthTitle: "Stealth Mode",
+      stealthDesc: "Advanced fingerprinting protection prevents detection.",
+      batchTitle: "Batch Parse",
+      batchDesc: "Queue up to 50 URLs at once via direct bulk paste.",
+      statsTitle: "10M+",
+      statsDesc: "Ads Processed",
       s1_t: "Copy Link",
       s1_d: "Find the ad in Facebook Ad Library and copy the URL from the browser address bar.",
       s2_t: "Paste & Process",
       s2_d: "Paste the link into the box above. Our headless browser engine will parse the media assets.",
       s3_t: "Download",
       s3_d: "Preview the video and click the download button to save the MP4 file to your device."
+    },
+    testimonials: {
+      tag: "User Reviews",
+      title: "Loved by 10,000+ Creators",
+      sub: "See how marketers are scaling their ad testing with AdSave."
+    },
+    faq: {
+      badge: "FAQ",
+      title: "Frequently Asked Questions",
+      subtitle: "Have other questions? Contact us at support@adsave.app"
+    },
+    footer: {
+      copyright: "© 2025 • AdSave.app All rights reserved.",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
+      close: "Close",
+      friendlyLinks: "Partners & Resources",
+      contact: "Contact Us"
     },
     faq_section: {
       title: "Frequently Asked Questions",
@@ -93,6 +130,14 @@ export const translations = {
     }
   },
   zh: {
+    nav: {
+      chromeExt: '谷歌扩展',
+      tutorial: '教程',
+      faq: 'FAQ',
+      login: '登录',
+      getStarted: '开始使用',
+      credits: '剩余额度'
+    },
     header: {
       how: "使用教程",
       pricing: "定价",
@@ -103,10 +148,10 @@ export const translations = {
       credits: "今日额度"
     },
     hero: {
-      title_prefix: "下载",
-      title_highlight: "Facebook 广告资料库",
-      title_suffix: "高清视频",
-      full_title: "下载 Facebook 广告资料库视频",
+      title_prefix: "Facebook 广告资料库",
+      title_highlight: "终极下载解析神器",
+      title_suffix: "",
+      full_title: "Facebook 广告资料库 终极下载解析神器",
       subtitle: "只需一键，即可解析并下载 Facebook 广告资料库中的高清视频与文案素材。支持无头浏览器模拟技术，轻松绕过反爬虫限制。",
       placeholder: "在此粘贴 Facebook 广告链接...",
       btn_download: "立即下载",
@@ -117,7 +162,9 @@ export const translations = {
       mode_batch: "批量模式",
       extension_btn: "安装 Chrome 扩展",
       extension_desc: "更快捷、更方便",
-      view_tutorial: "查看视频教程"
+      view_tutorial: "查看视频教程",
+      stats_hours: "节省时间",
+      stats_rating: "用户评分"
     },
     tutorial: {
       title: "使用教程",
@@ -141,13 +188,40 @@ export const translations = {
       empty: "暂无历史记录"
     },
     features: {
-      title: "如何下载 Facebook 广告视频",
+      title: "为什么顶尖营销人员选择 AdSave",
+      subtitle: "分析、保存和迭代爆款素材所需的一切。",
+      sourceTitle: "1080p 原画质",
+      sourceDesc: "直接从 CDN 获取原始文件。无压缩损耗，画质无损。",
+      stealthTitle: "隐身模式",
+      stealthDesc: "先进的指纹保护技术，轻松绕过反爬虫检测。",
+      batchTitle: "批量解析",
+      batchDesc: "支持批量粘贴，一次队列处理多达 50 个链接。",
+      statsTitle: "1000万+",
+      statsDesc: "成功下载",
       s1_t: "复制链接",
       s1_d: "在 Facebook 广告资料库中找到目标广告，点击资料库\"...\"复制URL。",
       s2_t: "粘贴并解析",
       s2_d: "将链接粘贴到上方输入框。我们的云端引擎将自动解析视频资源。",
       s3_t: "下载保存",
       s3_d: "预览视频内容，点击下载按钮即可保存高清 MP4 文件到您的设备。"
+    },
+    testimonials: {
+      tag: "用户评价",
+      title: "超过 10,000+ 创作者的信赖",
+      sub: "看看顶尖营销人员如何使用 AdSave 提高效率。"
+    },
+    faq: {
+      badge: "常见问题",
+      title: "常见问题解答",
+      subtitle: "还有其他问题吗？请通过 support@adsave.app 联系我们"
+    },
+    footer: {
+      copyright: "© 2025 • AdSave.app 版权所有。",
+      privacy: "隐私政策",
+      terms: "服务条款",
+      close: "关闭",
+      friendlyLinks: "友情链接",
+      contact: "联系我们"
     },
     faq_section: {
       title: "常见问题解答",
