@@ -86,7 +86,13 @@ export const Navbar: React.FC = () => {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
               >
-                <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-6 h-6 rounded-full" />
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt={user.displayName || ''} className="w-6 h-6 rounded-full" />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                    <User size={14} className="text-white" />
+                  </div>
+                )}
                 <span className="max-w-[100px] truncate">{user.displayName}</span>
               </button>
 
@@ -96,7 +102,13 @@ export const Navbar: React.FC = () => {
                   {/* User Info */}
                   <div className="px-4 py-3 border-b border-slate-100">
                     <div className="flex items-center gap-3">
-                      <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-10 h-10 rounded-full" />
+                      {user.photoURL ? (
+                        <img src={user.photoURL} alt={user.displayName || ''} className="w-10 h-10 rounded-full" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                          <User size={20} className="text-white" />
+                        </div>
+                      )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-slate-900 truncate">{user.displayName}</p>
                         <p className="text-xs text-slate-500 truncate">{user.email}</p>
