@@ -266,7 +266,7 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('zh'); // Default to Chinese
+  const [language, setLanguage] = useState<Language>('en'); // Default to English
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t: translations[language] }}>

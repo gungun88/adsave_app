@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Languages, Menu, Zap, Crown, Chrome, BookOpen, HelpCircle, LogOut, User } from 'lucide-react';
+import { Languages, Menu, Zap, Crown, Chrome, BookOpen, HelpCircle, LogOut, User, ChevronDown } from 'lucide-react';
 import { Logo } from './Logo';
 import { useLanguage } from '../lib/i18n';
 import { useAuth } from '../lib/authContext';
@@ -14,13 +14,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onTutorialClick }) => {
   const { user, loginWithGoogle, logout } = useAuth();
   const usage = getUsageStats(user);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const languageMenuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu when clicking outside
+  // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setShowUserMenu(false);
+      }
+      if (languageMenuRef.current && !languageMenuRef.current.contains(event.target as Node)) {
+        setShowLanguageMenu(false);
       }
     };
 
@@ -75,17 +80,57 @@ export const Navbar: React.FC<NavbarProps> = ({ onTutorialClick }) => {
             <span>{usage.remaining}/{usage.limit}</span>
           </div>
 
-          {/* Language Switcher */}
-          <button
-            onClick={() => setLanguage(language === 'en' ? 'zh' : 'en')}
-            className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-full transition-colors flex items-center justify-center"
-            title="Switch Language"
-          >
-            <Languages size={20} />
-          </button>
+          {/* Language Switcher Dropdown */}
+          <div className="relative" ref={languageMenuRef}>
+            <button
+              onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
+              title="Switch Language"
+            >
+              <Languages size={16} />
+              <span className="hidden sm:inline">{language === 'en' ? 'English' : '中文'}</span>
+              <ChevronDown size={14} className={`transition-transform ${showLanguageMenu ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Language Dropdown Menu */}
+            {showLanguageMenu && (
+              <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-slate-200 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                <button
+                  onClick={() => {
+                    setLanguage('en');
+                    setShowLanguageMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                    language === 'en'
+                      ? 'text-indigo-600 bg-indigo-50 font-semibold'
+                      : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <span className="text-lg">🇺🇸</span>
+                  <span>English</span>
+                  {language === 'en' && <span className="ml-auto text-indigo-600">✓</span>}
+                </button>
+                <button
+                  onClick={() => {
+                    setLanguage('zh');
+                    setShowLanguageMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                    language === 'zh'
+                      ? 'text-indigo-600 bg-indigo-50 font-semibold'
+                      : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <span className="text-lg">🇨🇳</span>
+                  <span>中文</span>
+                  {language === 'zh' && <span className="ml-auto text-indigo-600">✓</span>}
+                </button>
+              </div>
+            )}
+          </div>
 
           {user ? (
-            <div className="relative" ref={menuRef}>
+            <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
