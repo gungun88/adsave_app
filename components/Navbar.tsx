@@ -1,5 +1,5 @@
-import React from 'react';
-import { Languages, Menu, Zap, Crown, Chrome, BookOpen, HelpCircle } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Languages, Menu, Zap, Crown, Chrome, BookOpen, HelpCircle, LogOut, User } from 'lucide-react';
 import { Logo } from './Logo';
 import { useLanguage } from '../lib/i18n';
 import { useAuth } from '../lib/authContext';
@@ -7,8 +7,22 @@ import { getUsageStats } from '../services/usageService';
 
 export const Navbar: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
-  const { user, loginWithGoogle } = useAuth();
+  const { user, loginWithGoogle, logout } = useAuth();
   const usage = getUsageStats(user);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const scrollToFAQ = () => {
     const faqElement = document.getElementById('faq');
@@ -67,9 +81,50 @@ export const Navbar: React.FC = () => {
           </button>
 
           {user ? (
-            <div className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-full">
-              <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-6 h-6 rounded-full" />
-              <span className="max-w-[100px] truncate">{user.displayName}</span>
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
+              >
+                <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-6 h-6 rounded-full" />
+                <span className="max-w-[100px] truncate">{user.displayName}</span>
+              </button>
+
+              {/* User Dropdown Menu */}
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {/* User Info */}
+                  <div className="px-4 py-3 border-b border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <img src={user.photoURL || ''} alt={user.displayName || ''} className="w-10 h-10 rounded-full" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 truncate">{user.displayName}</p>
+                        <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg">
+                      <Zap size={14} className={usage.remaining > 0 ? "fill-amber-500 text-amber-500" : "text-slate-400"} />
+                      <span className="text-xs font-semibold text-slate-700">
+                        {usage.remaining}/{usage.limit} {language === 'zh' ? '次额度' : 'credits'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="py-1">
+                    <button
+                      onClick={() => {
+                        logout();
+                        setShowUserMenu(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <LogOut size={16} className="text-slate-400" />
+                      <span>{language === 'zh' ? '退出登录' : 'Logout'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <button
